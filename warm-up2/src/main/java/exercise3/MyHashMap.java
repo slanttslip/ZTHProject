@@ -1,5 +1,6 @@
 package exercise3;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -27,21 +28,55 @@ public class MyHashMap {
 
     public String get(String key) {
         // TODO
+        //null
+        if (key == null)
+            return null;
+        //existent
+        int hashCode;
+        if (key.hashCode() <0) {
+            hashCode = -key.hashCode() % capacity;
+        } else {
+            hashCode = key.hashCode() % capacity;
+        }
+        LinkedList<MyEntry> myBucket = buckets.get(hashCode);
+        for (MyEntry entry : myBucket) {
+            if (entry.getKey().equals(key))
+                return entry.getValue();
+        }
+        // non existent
         return null;
     }
 
     public void put(String key, String value) {
         // TODO
+        int hashCode;
+        if (key.hashCode() < 0) {
+            hashCode = -key.hashCode() % capacity;
+        } else {
+            hashCode = key.hashCode() % capacity;
+        }
+        buckets.get(hashCode).add(new MyEntry(key, value));
     }
 
     public Set<String> keySet() {
-        // TODO
-        return null;
+        HashSet<String> keySet = new HashSet<String>();
+        for (LinkedList<MyEntry> bucket : buckets) {
+            for (MyEntry entry : bucket) {
+                keySet.add(entry.getKey());
+            }
+        }
+        return keySet;
     }
 
     public Collection<String> values() {
         // TODO
-        return null;
+        LinkedList<String> valuesList = new LinkedList<String>();
+        for (LinkedList<MyEntry> bucket : buckets) {
+            for (MyEntry entry : bucket) {
+                valuesList.add(entry.getValue());
+            }
+        }
+        return valuesList;
     }
 
     public String remove(String key) {
@@ -61,7 +96,13 @@ public class MyHashMap {
 
     public int size() {
         // TODO Return the number of the Entry objects stored in all the buckets
-        return 0;
+        int size = 0;
+        for (LinkedList<MyEntry> bucket : buckets) {
+            for (MyEntry entry : bucket) {
+                size++;
+            }
+        }
+        return size;
     }
 
     public void clear() {
@@ -102,5 +143,7 @@ public class MyHashMap {
         public void setValue(String value) {
             this.value = value;
         }
+
+        public String toString() { return "Element: " + key + " " + value; }
     }
 }
