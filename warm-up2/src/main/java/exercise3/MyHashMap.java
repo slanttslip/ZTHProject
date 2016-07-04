@@ -49,13 +49,18 @@ public class MyHashMap {
 
     public void put(String key, String value) {
         // TODO
-        int hashCode;
-        if (key.hashCode() < 0) {
-            hashCode = -key.hashCode() % capacity;
+        if (key == null) {
+            buckets.get(0).add(new MyEntry(key, value));
         } else {
-            hashCode = key.hashCode() % capacity;
+            int hashCode;
+            if (key.hashCode() < 0) {
+                hashCode = -key.hashCode() % capacity;
+            } else {
+                hashCode = key.hashCode() % capacity;
+            }
+            if (!this.values().contains(value))
+                buckets.get(hashCode).add(new MyEntry(key, value));
         }
-        buckets.get(hashCode).add(new MyEntry(key, value));
     }
 
     public Set<String> keySet() {
@@ -81,17 +86,49 @@ public class MyHashMap {
 
     public String remove(String key) {
         // TODO Returns the value associated with the key removed from the map or null if the key wasn't found
+        int hashCode;
+        if (key.hashCode() <0) {
+            hashCode = -key.hashCode() % capacity;
+        } else {
+            hashCode = key.hashCode() % capacity;
+        }
+
+        LinkedList<MyEntry> bucket = buckets.get(hashCode);
+        for (MyEntry entry : bucket) {
+            if (entry.getKey().equals(key)) {
+                MyEntry returnEntry = new MyEntry(entry.getKey(), entry.getValue());
+                bucket.remove(entry);
+                return returnEntry.getValue();
+            }
+
+        }
         return null;
     }
 
     public boolean containsKey(String key) {
         // TODO
+        int hashCode;
+        if (key.hashCode() <0) {
+            hashCode = -key.hashCode() % capacity;
+        } else {
+            hashCode = key.hashCode() % capacity;
+        }
+
+        LinkedList<MyEntry> bucket = buckets.get(hashCode);
+        for (MyEntry entry : bucket) {
+            if (entry.getKey().equals(key))
+                return true;
+        }
         return false;
     }
 
     public boolean containsValue(String value) {
         // TODO
-        return false;
+        Collection<String> valuesList = this.values();
+        if (valuesList.contains(value))
+            return true;
+        else
+            return false;
     }
 
     public int size() {
@@ -107,16 +144,31 @@ public class MyHashMap {
 
     public void clear() {
         // TODO Remove all the Entry objects from the bucket list
+        for (LinkedList<MyEntry> bucket : buckets) {
+            bucket.clear();
+        }
     }
 
     public Set<MyEntry> entrySet() {
         // TODO Return a Set containing all the Entry objects
-        return null;
+        HashSet<MyEntry> entrySet = new HashSet<MyEntry>();
+
+
+        for(LinkedList<MyEntry> bucket : buckets){
+            for(MyEntry entry : bucket ){
+                entrySet.add(entry);
+            }
+        }
+        return entrySet;
     }
 
     public boolean isEmpty() {
-        // TODO
-        return false;
+
+        if(this.size() == 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static class MyEntry {
